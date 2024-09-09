@@ -54,7 +54,6 @@ CUDA Version：`12.1`
 python generation_main.py \
     --start_id 0 \
     --end_id 3 \
-    --python_path <your_path_to_python> \
     --source_data_file data/toy_data.json \
     --identify test \
     --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \
@@ -78,7 +77,6 @@ python generation_main.py \
 python generation_main.py \
     --start_id 0 \
     --end_id 8 \
-    --python_path <your_path_to_python> \
     --source_data_file data/AIOps_data.json \
     --identify reproduce \
     --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \

@@ -10,7 +10,6 @@ import pandas as pd
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--python_path", type=str, required=True)
     parser.add_argument("--model_path", type=str, required=True)
     parser.add_argument("--source_data_file", type=str, required=True)
     parser.add_argument("--identify", type=str, required=True)
@@ -65,11 +64,10 @@ def run_generation(
     type,
     file_path,
     target_file,
-    my_python,
     model_path,
 ):
     cmds = [
-        my_python,
+        "python",
         f"src/self_evolution_generate.py",
         f"--data_file={file_path}",
         f"--target_file={target_file}",
@@ -94,12 +92,11 @@ def run_generation_vllm(
     type,
     file_path,
     target_file,
-    my_python,
     target_model_path,
     infer_gpu,
 ):
     cmds = [
-        my_python,
+        "python",
         f"src/self_evolution_generate.py",
         "--model_name_or_path",
         target_model_path,
@@ -134,7 +131,7 @@ def check_and_create_directory(path):
             return False
 
 
-def merge_sft_model(generation_id, identify, model_path, my_python):
+def merge_sft_model(generation_id, identify, model_path):
 
     if generation_id == 0:
         return model_path
@@ -143,7 +140,7 @@ def merge_sft_model(generation_id, identify, model_path, my_python):
         print("Full model's path exist!!! No need to merge!!!")
         return export_dir
     cmds = [
-        my_python,
+        "python",
         "src/export_model.py",
         "--model_name_or_path",
         model_path,
@@ -185,7 +182,6 @@ def delete_merged_model(model_path):
 
 
 def generage_questions_multithread(
-    my_python,
     model_path,
     identify,
     source_data_file,
@@ -208,7 +204,7 @@ def generage_questions_multithread(
     with ThreadPoolExecutor(max_workers=worker_number) as executor:
         if use_vllm:
             target_model_path = merge_sft_model(
-                generation_id, identify, model_path, my_python
+                generation_id, identify, model_path
             )
             futures = [
                 executor.submit(
@@ -219,7 +215,6 @@ def generage_questions_multithread(
                     "question",
                     file_path,
                     target_file,
-                    my_python,
                     target_model_path,
                     infer_gpu,
                 )
@@ -236,7 +231,6 @@ def generage_questions_multithread(
                     "question",
                     file_path,
                     target_file,
-                    my_python,
                     model_path,
                 )
                 for i in range(0, length, batch_size)
@@ -257,7 +251,6 @@ def generage_questions_multithread(
 
 
 def generage_answers_multithread(
-    my_python,
     model_path,
     identify,
     source_data_file,
@@ -271,7 +264,6 @@ def generage_answers_multithread(
 ):
     if ques_first:
         file_path = generage_questions_multithread(
-            my_python,
             model_path,
             identify,
             source_data_file,
@@ -304,7 +296,7 @@ def generage_answers_multithread(
     with ThreadPoolExecutor(max_workers=worker_number) as executor:
         if use_vllm:
             target_model_path = merge_sft_model(
-                generation_id, identify, model_path, my_python
+                generation_id, identify, model_path
             )
             futures = [
                 executor.submit(
@@ -315,7 +307,6 @@ def generage_answers_multithread(
                     "answer",
                     file_path,
                     target_file,
-                    my_python,
                     target_model_path,
                     infer_gpu,
                 )
@@ -332,7 +323,6 @@ def generage_answers_multithread(
                     "answer",
                     file_path,
                     target_file,
-                    my_python,
                     model_path,
                 )
                 for i in range(0, length, batch_size)
@@ -354,7 +344,7 @@ def generage_answers_multithread(
 
 
 def train_model(
-    evolution_step, identify, model_path, my_python, train_epoch=1, cuda_device=0
+    evolution_step, identify, model_path, train_epoch=1, cuda_device=0
 ):
     dataset_file = f"result_datas/{identify}/qas_train_{identify}_{evolution_step}.json"
 
@@ -364,7 +354,7 @@ def train_model(
         dataset_file += f",result_datas/{identify}/qas_train_{identify}_ifd.json"
     os.environ["CUDA_VISIBLE_DEVICES"] = f"{cuda_device}"
     cmds = [
-        my_python,
+        "python",
         "src/train_bash.py",
         "--stage",
         "sft",
@@ -409,7 +399,6 @@ def train_model(
 
 
 def eval_model(
-    my_python,
     model_path,
     evolution_step,
     identify,
@@ -419,7 +408,7 @@ def eval_model(
 ):
 
     cmds = [
-        my_python,
+        "python",
         "src/train_bash.py",
         "--stage",
         "sft",
@@ -452,7 +441,6 @@ def eval_model(
 
 
 def run_all_evals(
-    my_python,
     model_path,
     start_id,
     end_id,
@@ -468,7 +456,6 @@ def run_all_evals(
         futures = [
             executor.submit(
                 eval_model,
-                my_python,
                 model_path,
                 i,
                 identify,
@@ -484,10 +471,10 @@ def run_all_evals(
                 pbar.update(1)
 
 
-def ifd_model(my_python, model_path, evolution_step, identify):
+def ifd_model(model_path, evolution_step, identify):
     print("“Stage Calculate IFD Score”")
     cmds = [
-        my_python,
+        "python",
         "src/get_ifd_original.py",
         "--json_data_path",
         f"result_datas/{identify}/qas_train_{identify}_{evolution_step}.json",
@@ -570,7 +557,6 @@ def main():
         print("--------------------------")
 
         generage_answers_multithread(
-            my_python=args.python_path,
             model_path=args.model_path,
             identify=args.identify,
             source_data_file=args.source_data_file,
@@ -600,14 +586,13 @@ def main():
                     i,
                     args.identify,
                     args.model_path,
-                    args.python_path,
                     args.train_epoch,
                     args.cuda_device,
                 )
             )
             futures.append(
                 executor.submit(
-                    ifd_model, args.python_path, args.model_path, i, args.identify
+                    ifd_model, args.model_path, i, args.identify
                 )
             )
 
@@ -616,7 +601,6 @@ def main():
                     pbar.update(1)
 
     run_all_evals(
-        my_python=args.python_path,
         model_path=args.model_path,
         start_id=args.start_id + 1,
         end_id=args.end_id + 1,

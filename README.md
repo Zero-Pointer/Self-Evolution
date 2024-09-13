@@ -101,7 +101,7 @@ python draw_scores.py \
     --res_dir exp_res/col_res
 ```
 
-After the above command is executed, the bar chart drawn based on the results of this experiment can be obtained in the exp_des/col_des directory.
+After the above command is executed, the bar chart drawn based on the results of this experiment can be obtained in the exp_res/col_res directory.
 
 Execute the following command in the Self-Evolution project directory:
 
@@ -111,7 +111,7 @@ python main-abl-all.py \
     --res_dir exp_res/abl_res
 ```
 
-After the above command is executed, the ablation experiment line chart drawn based on the results of this experiment can be obtained in the exp_des/abla_des directory.
+After the above command is executed, the ablation experiment line chart drawn based on the results of this experiment can be obtained in the exp_res/abl_res directory.
 
 ### Parameter Description
 

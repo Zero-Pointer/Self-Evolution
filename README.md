@@ -11,6 +11,7 @@ SELF-EVOLUTION
 │  draw_scores.py   // Script for drawing bar charts of experimental results
 │  generation_main.py   // Main program
 │  LICENSE
+│  main-abl-all.py   // Script for drawing line chart of ablation experiment results
 │  README.md
 │  README_zh.md
 │  requirements.txt // Packages required for program execution
@@ -56,7 +57,7 @@ python generation_main.py \
     --end_id 3 \
     --source_data_file data/toy_data.json \
     --identify test \
-    --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \
+    --model_path <The path of your initial model> \
     --eval_data data/toy_eval_data.json \
     --eval_to_path eval_result/qas_train \
     --mode hard \
@@ -79,7 +80,7 @@ python generation_main.py \
     --end_id 8 \
     --source_data_file data/AIOps_data.json \
     --identify reproduce \
-    --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \
+    --model_path <The path of your initial model> \
     --eval_data data/AIOps_eval_data.json \
     --eval_to_path eval_result/qas_train \
     --mode hard \
@@ -96,10 +97,21 @@ After the program runs, execute the following command in the Self-Evolution proj
 
 ```shell
 python draw_scores.py \
-    --father_dir ./eval_result/qas_train/reproduce_generations
+    --father_dir ./eval_result/qas_train/reproduce_generations \
+    --res_dir exp_res/col_res
 ```
 
-After the above command is executed, the bar chart drawn based on the results of this experiment can be obtained in the current directory.
+After the above command is executed, the bar chart drawn based on the results of this experiment can be obtained in the exp_des/col_des directory.
+
+Execute the following command in the Self-Evolution project directory:
+
+```shell
+python main-abl-all.py \
+    --father_dir ./eval_result/qas_train/reproduce_generations \
+    --res_dir exp_res/abl_res
+```
+
+After the above command is executed, the ablation experiment line chart drawn based on the results of this experiment can be obtained in the exp_des/abla_des directory.
 
 ### Parameter Description
 
@@ -122,7 +134,7 @@ After the above command is executed, the bar chart drawn based on the results of
 `--use_vllm`: Use the vllm framework to accelerate inference  
 `--batch_size`: The size of data chunks  
 `--worker_number`: The maximum number of threads  
-`--infer_gpu 1`: The number of GPUs used during the inference phase  
+`--infer_gpu`: The number of GPUs used during the inference phase  
 `--cuda_device`: The GPU identifier used during the model training phase  
 
 ## Data Format

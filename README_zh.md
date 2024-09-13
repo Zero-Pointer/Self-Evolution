@@ -11,6 +11,7 @@ SELF-EVOLUTION
 │  draw_scores.py   // 实验结果柱状图绘制脚本
 │  generation_main.py   // 主程序
 │  LICENSE
+│  main-abl-all.py   // 消融实验结果折线图绘制脚本
 │  README.md
 │  README_zh.md
 │  requirements.txt // 程序运行需要的包
@@ -56,7 +57,7 @@ python generation_main.py \
     --end_id 3 \
     --source_data_file data/toy_data.json \
     --identify test \
-    --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \
+    --model_path <你的初始模型的路径> \
     --eval_data data/toy_eval_data.json \
     --eval_to_path eval_result/qas_train \
     --mode hard \
@@ -79,7 +80,7 @@ python generation_main.py \
     --end_id 8 \
     --source_data_file data/AIOps_data.json \
     --identify reproduce \
-    --model_path <your_path_to_hf_converted_llama_ckpt_and_tokenizer> \
+    --model_path <你的初始模型的路径> \
     --eval_data data/AIOps_eval_data.json \
     --eval_to_path eval_result/qas_train \
     --mode hard \
@@ -96,10 +97,21 @@ python generation_main.py \
 
 ```shell
 python draw_scores.py \
-    --father_dir ./eval_result/qas_train/reproduce_generations
+    --father_dir ./eval_result/qas_train/reproduce_generations \
+    --res_dir exp_res/col_res
 ```
 
-上述命令执行完毕后，即可在当前目录下得到根据本次实验结果绘制的柱状图。
+上述命令执行完毕后，即可在exp_res/col_res目录下得到根据本次实验结果绘制的柱状图。
+
+在Self-Evolution项目目录下执行以下命令：
+
+```shell
+python main-abl-all.py \
+    --father_dir ./eval_result/qas_train/reproduce_generations \
+    --res_dir exp_res/abl_res
+```
+
+上述命令执行完毕后，即可在exp_res/abl_res目录下得到根据本次实验结果绘制的消融实验折线图。
 
 ### 参数说明
 
@@ -122,7 +134,7 @@ python draw_scores.py \
 `--use_vllm`：使用vllm加速推理框架  
 `--batch_size`：数据分块大小  
 `--worker_number`：最大线程数  
-`--infer_gpu 1`：推理阶段使用的gpu数量  
+`--infer_gpu`：推理阶段使用的gpu数量  
 `--cuda_device`：模型训练阶段使用的gpu序号
 
 ## 数据格式
